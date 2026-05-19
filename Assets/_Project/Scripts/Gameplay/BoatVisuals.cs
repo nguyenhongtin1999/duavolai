@@ -31,9 +31,13 @@ namespace MienTayDaiChien.Gameplay
             if (boatModel != null)
             {
                 float steerTilt = -Vector3.Dot(_rb.angularVelocity, transform.up) * modelTiltFactor;
+                
+                // Drift banking bonus
+                if (_controller.IsDrifting) steerTilt *= 2.5f;
+
                 boatModel.transform.localRotation = Quaternion.Euler(0, 0, steerTilt);
             }
-        }
+}
 
         private void OnCollisionEnter(Collision collision)
         {

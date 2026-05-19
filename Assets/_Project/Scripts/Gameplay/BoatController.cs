@@ -16,12 +16,24 @@ namespace MienTayDaiChien.Gameplay
         public float speedMultiplier = 1.0f;
         
         [Header("Drift & Slippery Feel")]
-        [Range(0, 1)] public float lateralDrag = 0.95f; // Lower = more slippery
+        [Range(0, 1)] public float lateralDrag = 0.95f; 
         public float driftLateralDrag = 0.6f;
         public float currentLateralDragOverride = -1f;
 
+        [Header("Drift Boost System")]
+        public float driftChargeRate = 0.5f;
+        public float driftBoostLevel1 = 0.4f; // Blue sparks
+        public float driftBoostLevel2 = 0.8f; // Orange sparks
+        public float driftBoostLevel3 = 1.2f; // Purple sparks
+        public float driftBoostMultiplier = 1.4f;
+        public float driftBoostDurationBase = 1.0f;
+
+        private float _currentDriftCharge;
+        private int _driftLevel; // 0, 1, 2, 3
+        private int _driftDirection; // -1 for Left, 1 for Right, 0 for none
+
         [Header("Boost System")]
-        public float boostMultiplier = 2f;
+public float boostMultiplier = 2f;
         public float boostDuration = 3f;
         public float boostCooldown = 5f;
         public float boostCapacity = 1.0f;
@@ -46,6 +58,7 @@ namespace MienTayDaiChien.Gameplay
 
         public bool IsBoosting => _isBoosting;
         public bool IsDrifting => _isDrifting;
+        public int DriftLevel => _driftLevel;
         public float CurrentSpeed => _rb != null ? _rb.linearVelocity.magnitude : 0;
         public float BoostProgress => _isBoosting ? _currentBoostTime / boostDuration : _currentBoostAmount / boostCapacity;
         public float BoostMeter => _currentBoostAmount;
@@ -61,14 +74,63 @@ namespace MienTayDaiChien.Gameplay
 
         public void SetInput(float steer, float accel, float brake, bool drift)
         {
+            // Detect Drift Entry
+            if (drift && !_isDrifting && Mathf.Abs(steer) > 0.1f && CurrentSpeed > 5f)
+            {
+                StartDrift(steer);
+            }
+            else if (!drift && _isDrifting)
+            {
+                EndDrift();
+            }
+
             if (Mathf.Abs(steer) > 0.01f || Mathf.Abs(accel) > 0.01f || Mathf.Abs(brake) > 0.01f)
             {
-                Debug.Log($"[BoatController] Input received: Steer={steer}, Accel={accel}, Brake={brake}, Drift={drift}");
+                // Debug.Log($"[BoatController] Input received: Steer={steer}, Accel={accel}, Brake={brake}, Drift={drift}");
             }
             _steerInput = steer;
             _accelInput = accel;
             _brakeInput = brake;
-            _isDrifting = drift;
+            // Drift state is managed by Start/End methods
+        }
+
+        private void StartDrift(float steer)
+        {
+            _isDrifting = true;
+            _driftDirection = steer > 0 ? 1 : -1;
+            _currentDriftCharge = 0f;
+            _driftLevel = 0;
+            
+            // Arcade "Hop" on entry
+            _rb.AddForce(Vector3.up * 5f, ForceMode.VelocityChange);
+            
+            Debug.Log($"[Drift] Started drifting to the {(_driftDirection > 0 ? "Right" : "Left")}");
+        }
+
+        private void EndDrift()
+        {
+            if (_driftLevel > 0)
+            {
+                TriggerDriftBoost();
+            }
+
+            _isDrifting = false;
+            _driftDirection = 0;
+            _currentDriftCharge = 0f;
+            _driftLevel = 0;
+            Debug.Log("[Drift] Ended drift");
+        }
+
+        private void TriggerDriftBoost()
+        {
+            float duration = driftBoostDurationBase * _driftLevel;
+            float multiplier = 1f + (driftBoostMultiplier - 1f) * (_driftLevel / 3f);
+            
+            // Temporary boost override or just use the existing boost logic
+            // For now, let's inject it into the boost system but with a shorter duration
+            _isBoosting = true;
+            _currentBoostTime = duration;
+            Debug.Log($"[Drift] Boost Level {_driftLevel} Activated! Duration: {duration}s");
         }
 
         public void TryBoost()
@@ -148,28 +210,51 @@ namespace MienTayDaiChien.Gameplay
 
         private void HandleSteering()
         {
-            // Arcade Steering: Direct angular velocity for instant response
-            float speedFactor = Mathf.Clamp01(_rb.linearVelocity.magnitude / maxSpeed);
-            float steeringPower = Mathf.Max(0.5f, speedFactor); // Minimum power at low speed
+            float steerVal = _steerInput;
             
-            float targetAngularVel = _steerInput * (steeringTorque / mass) * steeringPower;
-            if (_isDrifting) targetAngularVel *= 1.5f;
-
-            // Smoothly interpolate to target angular velocity
-            _rb.angularVelocity = Vector3.Lerp(_rb.angularVelocity, transform.up * targetAngularVel, Time.fixedDeltaTime * 10f);
-
-            // Arcade Trick: Rotate the velocity vector to match the boat's turn
-            // This ensures the boat "grips" the water and turns its momentum
-            if (!_isDrifting && _rb.linearVelocity.magnitude > 1f)
+            if (_isDrifting)
             {
-                float turnAngle = _rb.angularVelocity.y * Time.fixedDeltaTime;
-                _rb.linearVelocity = Quaternion.Euler(0, turnAngle * Mathf.Rad2Deg * 0.5f, 0) * _rb.linearVelocity;
-            }
+                // Drift Steering: steer direction is locked to _driftDirection, 
+                // but input affects the tightness of the slide
+                float steerInfluence = _steerInput * _driftDirection; // 1 if matching, -1 if counter-steering
+                
+                // Rotation Y influence
+                float torque = _driftDirection * steeringTorque * 1.5f;
+                if (steerInfluence > 0) torque *= 1.2f; // Tighten slide
+                else torque *= 0.5f; // Counter-steer / widen slide
 
-            if (Mathf.Abs(_steerInput) > 0.05f && Time.frameCount % 60 == 0)
-            {
-                Debug.Log($"[Steering] Input: {_steerInput:F2}, TargetAngVel: {targetAngularVel:F2}, Current: {_rb.angularVelocity.y:F2}");
+                _rb.AddTorque(transform.up * torque, ForceMode.Force);
+
+                // Charge drift meter based on speed and steer influence
+                if (steerInfluence > 0) // Charging only while steering into it or sliding
+                {
+                    _currentDriftCharge += Time.fixedDeltaTime * driftChargeRate;
+                    UpdateDriftLevel();
+                }
             }
+            else if (Mathf.Abs(steerVal) > 0.05f)
+            {
+                // Normal Speed-sensitive Steering
+                float speedFactor = Mathf.Clamp01(_rb.linearVelocity.magnitude / maxSpeed);
+                float steeringPower = Mathf.Max(0.5f, speedFactor); 
+                float torque = steerVal * steeringTorque * steeringPower;
+                _rb.AddTorque(transform.up * torque, ForceMode.Force);
+                
+                // Arcade Trick: Rotate velocity vector to match turn
+                if (_rb.linearVelocity.magnitude > 1f)
+                {
+                    float turnAngle = _rb.angularVelocity.y * Time.fixedDeltaTime;
+                    _rb.linearVelocity = Quaternion.Euler(0, turnAngle * Mathf.Rad2Deg * 0.5f, 0) * _rb.linearVelocity;
+                }
+            }
+        }
+
+        private void UpdateDriftLevel()
+        {
+            if (_currentDriftCharge >= driftBoostLevel3) _driftLevel = 3;
+            else if (_currentDriftCharge >= driftBoostLevel2) _driftLevel = 2;
+            else if (_currentDriftCharge >= driftBoostLevel1) _driftLevel = 1;
+            else _driftLevel = 0;
         }
 
         private void ApplyLateralDrag()

@@ -115,14 +115,23 @@ namespace MienTayDaiChien.Gameplay
         private void HandleDriftFeedback()
         {
             bool isDrifting = _boat.IsDrifting;
+            int driftLevel = _boat.DriftLevel;
             
             if (isDrifting && _boat.CurrentSpeed > 5f)
             {
                 if (!driftSparks.isPlaying) driftSparks.Play();
-                TriggerHaptics(driftHapticIntensity, 0);
+                
+                // Color sparks based on level
+                var main = driftSparks.main;
+                if (driftLevel == 1) main.startColor = Color.blue;
+                else if (driftLevel == 2) main.startColor = new Color(1, 0.5f, 0); // Orange
+                else if (driftLevel == 3) main.startColor = new Color(0.6f, 0, 1); // Purple
+                else main.startColor = Color.white;
+
+                TriggerHaptics(driftHapticIntensity * (1 + driftLevel * 0.2f), 0);
                 
                 if (_mainCam != null)
-                    _mainCam.TriggerShake(0.5f, 0.05f);
+                    _mainCam.TriggerShake(0.5f + driftLevel * 0.1f, 0.05f);
             }
             else
             {
