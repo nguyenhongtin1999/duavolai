@@ -1,0 +1,23 @@
+{
+    "asset": "0eab1dd9ad0cde548a45baf5f25c950c",
+    "fileName": "019e3f8a-8908-77bc-9f04-dcc85da85a10.glb",
+    "prompt": "Stylized arcade race checkpoint marker for a tropical river racing game. Ornate wooden archway with colorful Vietnamese lanterns and Five-Color Flags. Semi-transparent glowing field inside. Low poly, high readability. Match the provided concept image.",
+    "negativePrompt": "",
+    "model": "model3d-tripo-p1",
+    "modelName": "Tripo P1",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "refinementMode": "Generation",
+    "promptImageReferenceGuid": "b9ab34527fbde26449b0e4ff66813672",
+    "modelReferenceGuid": "",
+    "multiviewFrontGuid": "",
+    "multiviewBackGuid": "",
+    "multiviewLeftGuid": "",
+    "multiviewRightGuid": "",
+    "multiviewTopGuid": "",
+    "multiviewBottomGuid": "",
+    "multiviewLeftFrontGuid": "",
+    "multiviewRightFrontGuid": "",
+    "faceLimit": -1
+}

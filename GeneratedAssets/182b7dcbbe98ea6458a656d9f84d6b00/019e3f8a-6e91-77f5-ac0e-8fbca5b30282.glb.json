@@ -1,0 +1,23 @@
+{
+    "asset": "182b7dcbbe98ea6458a656d9f84d6b00",
+    "fileName": "019e3f8a-6e91-77f5-ac0e-8fbca5b30282.glb",
+    "prompt": "Stylized floating race direction arrow. Bright yellow and red, wooden texture, arcade style. Pointing forward. Used for river race navigation. Match the provided concept image.",
+    "negativePrompt": "",
+    "model": "model3d-tripo-p1",
+    "modelName": "Tripo P1",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "refinementMode": "Generation",
+    "promptImageReferenceGuid": "65f734039aa675847942771cbf7d0de2",
+    "modelReferenceGuid": "",
+    "multiviewFrontGuid": "",
+    "multiviewBackGuid": "",
+    "multiviewLeftGuid": "",
+    "multiviewRightGuid": "",
+    "multiviewTopGuid": "",
+    "multiviewBottomGuid": "",
+    "multiviewLeftFrontGuid": "",
+    "multiviewRightFrontGuid": "",
+    "faceLimit": -1
+}

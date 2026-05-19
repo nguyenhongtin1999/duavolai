@@ -60,6 +60,9 @@ namespace MienTayDaiChien.Gameplay
             float speed = _boat.CurrentSpeed;
             float emissionScale = Mathf.InverseLerp(splashMinSpeed, _boat.maxSpeed, speed);
             
+            // Boost amplification
+            if (_boat.IsBoosting) emissionScale *= 1.5f;
+
             var emissionL = waterSplashL.emission;
             var emissionR = waterSplashR.emission;
             
@@ -72,6 +75,13 @@ namespace MienTayDaiChien.Gameplay
                 float rate = emissionScale * splashMaxEmission;
                 emissionL.rateOverTime = rate;
                 emissionR.rateOverTime = rate;
+                
+                // Scale particle size with speed/boost
+                var mainL = waterSplashL.main;
+                var mainR = waterSplashR.main;
+                float baseSize = 1.5f;
+                mainL.startSize = baseSize * (1f + emissionScale * 0.5f);
+                mainR.startSize = baseSize * (1f + emissionScale * 0.5f);
             }
         }
 

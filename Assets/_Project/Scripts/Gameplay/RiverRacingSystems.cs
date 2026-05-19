@@ -47,8 +47,14 @@ namespace MienTayDaiChien.Gameplay
         public int checkpointIndex;
         public bool isFinishLine;
 
+        [Header("Feedback")]
+        public ParticleSystem passVFX;
+        public AudioClip passSFX;
+        private AudioSource _audioSource;
+
         private void Start()
         {
+            _audioSource = GetComponent<AudioSource>();
             if (RaceManager.Instance != null)
                 RaceManager.Instance.RegisterCheckpoint(this);
         }
@@ -57,9 +63,22 @@ namespace MienTayDaiChien.Gameplay
         {
             if (other.TryGetComponent<RaceProgress>(out var progress))
             {
+                int oldIndex = progress.LastCheckpointIndex;
                 progress.OnCheckpointReached(checkpointIndex, isFinishLine);
+                
+                // Play feedback if progress was made
+                if (progress.LastCheckpointIndex != oldIndex)
+                {
+                    PlayFeedback();
+                }
                 Debug.Log($"Checkpoint {checkpointIndex} reached by {other.name}");
             }
+        }
+
+        private void PlayFeedback()
+        {
+            if (passVFX != null) passVFX.Play();
+            if (passSFX != null && _audioSource != null) _audioSource.PlayOneShot(passSFX);
         }
     }
 }

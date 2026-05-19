@@ -49,8 +49,12 @@ namespace MienTayDaiChien.UI
         }
 
         public void ResetBoat() => _player?.Respawn(Vector3.up * 5, Quaternion.identity);
+        public void ResetToCheckpoint()
+        {
+            if (_player != null && _player.TryGetComponent<RaceProgress>(out var p)) p.ResetToLastCheckpoint();
+        }
         public void ToggleSlowMo() => Time.timeScale = Time.timeScale < 1 ? 1 : 0.2f;
-    }
+}
 
     [RequireComponent(typeof(RectTransform))]
     public class SafeAreaFitter : MonoBehaviour

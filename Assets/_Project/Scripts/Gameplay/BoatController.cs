@@ -24,6 +24,10 @@ namespace MienTayDaiChien.Gameplay
         public float boostMultiplier = 2f;
         public float boostDuration = 3f;
         public float boostCooldown = 5f;
+        public float boostCapacity = 1.0f;
+        public float boostRefillRate = 0.05f;
+        
+        private float _currentBoostAmount;
         private float _currentBoostTime;
         private float _boostCooldownTimer;
         private bool _isBoosting;
@@ -36,14 +40,15 @@ namespace MienTayDaiChien.Gameplay
         private Rigidbody _rb;
         public float mass => _rb != null ? _rb.mass : 1000f;
         private float _steerInput;
-private float _accelInput;
+        private float _accelInput;
         private float _brakeInput;
         private bool _isDrifting;
 
         public bool IsBoosting => _isBoosting;
         public bool IsDrifting => _isDrifting;
         public float CurrentSpeed => _rb != null ? _rb.linearVelocity.magnitude : 0;
-        public float BoostProgress => _isBoosting ? _currentBoostTime / boostDuration : (boostCooldown - _boostCooldownTimer) / boostCooldown;
+        public float BoostProgress => _isBoosting ? _currentBoostTime / boostDuration : _currentBoostAmount / boostCapacity;
+        public float BoostMeter => _currentBoostAmount;
 
         private void Awake()
         {
@@ -51,6 +56,7 @@ private float _accelInput;
             _rb.useGravity = true;
             _rb.linearDamping = waterDrag;
             _rb.angularDamping = angularDrag;
+            _currentBoostAmount = boostCapacity;
         }
 
         public void SetInput(float steer, float accel, float brake, bool drift)
@@ -67,12 +73,17 @@ private float _accelInput;
 
         public void TryBoost()
         {
-            Debug.Log("[BoatController] Boost Requested");
-            if (!_isBoosting && _boostCooldownTimer <= 0)
+            if (!_isBoosting && _currentBoostAmount > 0.2f && _boostCooldownTimer <= 0)
             {
                 _isBoosting = true;
                 _currentBoostTime = boostDuration;
+                Debug.Log("[BoatController] Boost Activated");
             }
+        }
+
+        public void AddBoost(float amount)
+        {
+            _currentBoostAmount = Mathf.Clamp(_currentBoostAmount + amount, 0, boostCapacity);
         }
 
         public void Respawn(Vector3 pos, Quaternion rot)
@@ -175,16 +186,27 @@ private float _accelInput;
             if (_isBoosting)
             {
                 _currentBoostTime -= Time.fixedDeltaTime;
-                if (_currentBoostTime <= 0)
+                _currentBoostAmount -= (boostCapacity / boostDuration) * Time.fixedDeltaTime;
+                
+                if (_currentBoostTime <= 0 || _currentBoostAmount <= 0)
                 {
                     _isBoosting = false;
                     _boostCooldownTimer = boostCooldown;
+                    _currentBoostAmount = Mathf.Max(0, _currentBoostAmount);
                 }
             }
-            else if (_boostCooldownTimer > 0)
+            else
             {
-                _boostCooldownTimer -= Time.fixedDeltaTime;
+                if (_boostCooldownTimer > 0)
+                {
+                    _boostCooldownTimer -= Time.fixedDeltaTime;
+                }
+                else
+                {
+                    // Slow refill when not on cooldown
+                    AddBoost(boostRefillRate * Time.fixedDeltaTime);
+                }
             }
         }
-    }
+}
 }

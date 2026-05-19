@@ -3,21 +3,26 @@ using UnityEngine.Splines;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
+using Unity.Netcode;
 
 namespace MienTayDaiChien.Gameplay
 {
-/// <summary>
-    /// Authoritative race manager for ranking and progress tracking.
-    /// Works for both Players and AI.
-    /// </summary>
-    public class RaceManager : MonoBehaviour
+    public enum RaceState { Waiting, Countdown, Racing, Finished }
+
+    public class RaceManager : NetworkBehaviour
     {
         public static RaceManager Instance { get; private set; }
 
         [Header("Race Config")]
         public int totalLaps = 3;
+        public float countdownDuration = 3f;
         public RiverSpline riverSpline;
-        
+
+        [Header("Runtime State")]
+        public NetworkVariable<RaceState> currentState = new NetworkVariable<RaceState>(RaceState.Waiting);
+        public NetworkVariable<float> raceTimer = new NetworkVariable<float>(0f);
+        public NetworkVariable<float> countdownTimer = new NetworkVariable<float>(0f);
+
         private List<RaceProgress> _racers = new List<RaceProgress>();
         private List<RaceCheckpoint> _checkpoints = new List<RaceCheckpoint>();
 
@@ -29,6 +34,14 @@ namespace MienTayDaiChien.Gameplay
         private void Awake()
         {
             Instance = this;
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            if (IsServer)
+            {
+                currentState.Value = RaceState.Waiting;
+            }
         }
 
         public void RegisterRacer(RaceProgress racer)
@@ -43,19 +56,50 @@ namespace MienTayDaiChien.Gameplay
         }
 
         public int GetCheckpointCount() => _checkpoints.Count;
+        public RaceCheckpoint GetCheckpoint(int index) => (index >= 0 && index < _checkpoints.Count) ? _checkpoints[index] : null;
 
         private void Update()
         {
-            // Update Rankings for UI/Minimap every frame (optimized for mobile)
-            // In a real multiplayer game, this might be synced at a lower tick rate
+            if (!IsServer) return;
+
+            switch (currentState.Value)
+            {
+                case RaceState.Waiting:
+                    // Auto-start countdown if players are ready or after delay
+                    if (_racers.Count > 0) StartCountdown();
+                    break;
+                case RaceState.Countdown:
+                    countdownTimer.Value -= Time.deltaTime;
+                    if (countdownTimer.Value <= 0)
+                    {
+                        currentState.Value = RaceState.Racing;
+                        raceTimer.Value = 0f;
+                    }
+                    break;
+                case RaceState.Racing:
+                    raceTimer.Value += Time.deltaTime;
+                    // Check if all racers finished
+                    if (_racers.All(r => r.isFinished.Value))
+                    {
+                        currentState.Value = RaceState.Finished;
+                    }
+                    break;
+            }
         }
-        
+
+        public void StartCountdown()
+        {
+            if (!IsServer || currentState.Value != RaceState.Waiting) return;
+            countdownTimer.Value = countdownDuration;
+            currentState.Value = RaceState.Countdown;
+        }
+
         public bool IsWrongWay(Transform racerTransform, float t)
         {
             if (riverSpline == null) return false;
             Vector3 forward = racerTransform.forward;
             Vector3 tangent = riverSpline.Container.EvaluateTangent(t);
-            return Vector3.Dot(forward, tangent) < -0.5f; // Threshold for wrong way
+            return Vector3.Dot(forward, tangent) < -0.5f; 
         }
-        }
-        }
+    }
+}

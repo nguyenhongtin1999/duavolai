@@ -1,0 +1,28 @@
+{
+    "asset": "b9ab34527fbde26449b0e4ff66813672",
+    "fileName": "019e3f87-c42d-7451-aa0f-6961e61b433f.png",
+    "prompt": "Concept art of a stylized arcade race checkpoint marker for a tropical river racing game. Ornate wooden archway with colorful Vietnamese lanterns and Five-Color Flags. Semi-transparent glowing field inside. Front view, white background, high contrast.",
+    "negativePrompt": "",
+    "model": "gemini-3.1-flash",
+    "modelName": "Gemini 3.1 Nano Banana 2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "refinementMode": "Generation",
+    "pixelateTargetSize": 0,
+    "pixelateKeepImageSize": false,
+    "pixelatePixelBlockSize": 0,
+    "pixelatePixelGridSize": 0,
+    "pixelateMode": 0,
+    "pixelateOutlineThickness": 0,
+    "doodles": {
+        "m_Items": []
+    },
+    "upscaleFactor": 0,
+    "dimensions": {
+        "width": 1024,
+        "height": 1024
+    },
+    "spriteSheet": false,
+    "duration": 0.0
+}

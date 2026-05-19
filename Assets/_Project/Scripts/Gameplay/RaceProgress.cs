@@ -5,20 +5,18 @@ using Unity.Netcode;
 
 namespace MienTayDaiChien.Gameplay
 {
-    /// <summary>
-    /// Tracks individual racer progress. Synchronized across the network.
-    /// Only the server can validate and update lap/checkpoint state.
-    /// </summary>
     public class RaceProgress : NetworkBehaviour
     {
         [Header("Synced State")]
-        public NetworkVariable<int> currentLap = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-        public NetworkVariable<int> lastCheckpointIndex = new NetworkVariable<int>(-1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-        public NetworkVariable<float> distanceOnSpline = new NetworkVariable<float>(0f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-        public NetworkVariable<bool> isFinished = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-        public NetworkVariable<bool> isWrongWay = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        public NetworkVariable<int> currentLap = new NetworkVariable<int>(0);
+        public NetworkVariable<int> lastCheckpointIndex = new NetworkVariable<int>(-1);
+        public NetworkVariable<float> distanceOnSpline = new NetworkVariable<float>(0f);
+        public NetworkVariable<bool> isFinished = new NetworkVariable<bool>(false);
+        public NetworkVariable<bool> isWrongWay = new NetworkVariable<bool>(false);
+        public NetworkVariable<float> finishTime = new NetworkVariable<float>(0f);
 
         private RiverSpline _river;
+        private BoatController _boat;
 
         public int Lap => currentLap.Value;
         public int LastCheckpointIndex => lastCheckpointIndex.Value;
@@ -26,6 +24,7 @@ namespace MienTayDaiChien.Gameplay
 
         public override void OnNetworkSpawn()
         {
+            _boat = GetComponent<BoatController>();
             if (RaceManager.Instance != null)
                 RaceManager.Instance.RegisterRacer(this);
             
@@ -34,7 +33,7 @@ namespace MienTayDaiChien.Gameplay
 
         private void Update()
         {
-            if (!IsServer) return; // Only server calculates progress
+            if (!IsServer) return; 
             if (isFinished.Value || _river == null) return;
 
             // Authoritative Spline Tracking
@@ -45,14 +44,17 @@ namespace MienTayDaiChien.Gameplay
             
             distanceOnSpline.Value = t;
             
-            // Authoritative Wrong Way Detection
+            // Wrong Way Detection
             isWrongWay.Value = RaceManager.Instance.IsWrongWay(transform, t);
+
+            // Handle Boat Control based on Race State
+            if (RaceManager.Instance.currentState.Value == RaceState.Countdown || RaceManager.Instance.currentState.Value == RaceState.Waiting)
+            {
+                // Freeze boat during countdown
+                _boat.SetInput(0, 0, 0, false);
+            }
         }
 
-        /// <summary>
-        /// Called when racer enters a checkpoint trigger.
-        /// Client detects, server validates.
-        /// </summary>
         public void OnCheckpointReached(int index, bool isFinishLine)
         {
             if (!IsServer)
@@ -72,6 +74,8 @@ namespace MienTayDaiChien.Gameplay
 
         private void ProcessCheckpoint(int index, bool isFinishLine)
         {
+            if (isFinished.Value) return;
+
             int expected = lastCheckpointIndex.Value + 1;
             int totalCPs = RaceManager.Instance.GetCheckpointCount();
             
@@ -87,10 +91,37 @@ namespace MienTayDaiChien.Gameplay
                     if (currentLap.Value >= RaceManager.Instance.totalLaps)
                     {
                         isFinished.Value = true;
-                        Debug.Log($"Server: {gameObject.name} finished!");
+                        finishTime.Value = RaceManager.Instance.raceTimer.Value;
+                        _boat.SetInput(0, 0, 1, false); // Auto-brake on finish
                     }
                 }
             }
+        }
+
+        public void ResetToLastCheckpoint()
+        {
+            if (!IsServer)
+            {
+                ResetToLastCheckpointServerRpc();
+                return;
+            }
+
+            RaceCheckpoint lastCP = RaceManager.Instance.GetCheckpoint(lastCheckpointIndex.Value);
+            if (lastCP != null)
+            {
+                _boat.Respawn(lastCP.transform.position + Vector3.up * 2, lastCP.transform.rotation);
+            }
+            else
+            {
+                // Fallback to start
+                _boat.Respawn(Vector3.up * 5, Quaternion.identity);
+            }
+        }
+
+        [ServerRpc]
+        private void ResetToLastCheckpointServerRpc()
+        {
+            ResetToLastCheckpoint();
         }
     }
 }
