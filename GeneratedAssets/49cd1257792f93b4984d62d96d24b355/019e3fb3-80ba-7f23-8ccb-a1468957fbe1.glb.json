@@ -1,0 +1,23 @@
+{
+    "asset": "49cd1257792f93b4984d62d96d24b355",
+    "fileName": "019e3fb3-80ba-7f23-8ccb-a1468957fbe1.glb",
+    "prompt": "Stylized arcade boost pad for a river racing game. A floating wooden platform with glowing neon cyan arrows and tropical Vietnamese lotus patterns. Low poly, high visibility from a distance. Match the provided concept image.",
+    "negativePrompt": "",
+    "model": "model3d-tripo-p1",
+    "modelName": "Tripo P1",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "refinementMode": "Generation",
+    "promptImageReferenceGuid": "9dc8fbb9a120ce345aac5d232e8c42da",
+    "modelReferenceGuid": "",
+    "multiviewFrontGuid": "",
+    "multiviewBackGuid": "",
+    "multiviewLeftGuid": "",
+    "multiviewRightGuid": "",
+    "multiviewTopGuid": "",
+    "multiviewBottomGuid": "",
+    "multiviewLeftFrontGuid": "",
+    "multiviewRightFrontGuid": "",
+    "faceLimit": -1
+}

@@ -1,0 +1,28 @@
+{
+    "asset": "9dc8fbb9a120ce345aac5d232e8c42da",
+    "fileName": "019e3fb1-19bb-795a-b8af-036d12866330.png",
+    "prompt": "Concept art of a stylized arcade boost pad for a tropical river racing game. A floating wooden platform with glowing neon cyan arrows and tropical Vietnamese lotus patterns. Top-down view, white background, high contrast, vibrant colors.",
+    "negativePrompt": "",
+    "model": "gemini-3.1-flash",
+    "modelName": "Gemini 3.1 Nano Banana 2",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "refinementMode": "Generation",
+    "pixelateTargetSize": 0,
+    "pixelateKeepImageSize": false,
+    "pixelatePixelBlockSize": 0,
+    "pixelatePixelGridSize": 0,
+    "pixelateMode": 0,
+    "pixelateOutlineThickness": 0,
+    "doodles": {
+        "m_Items": []
+    },
+    "upscaleFactor": 0,
+    "dimensions": {
+        "width": 1024,
+        "height": 1024
+    },
+    "spriteSheet": false,
+    "duration": 0.0
+}
