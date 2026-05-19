@@ -24,6 +24,7 @@ namespace MienTayDaiChien.UI
 
         private Transform _playerTransform;
         private List<MinimapIcon> _icons = new List<MinimapIcon>();
+        private float _nextPlayerLookupTime;
 
         private void Awake()
         {
@@ -46,8 +47,9 @@ namespace MienTayDaiChien.UI
 
         private void LateUpdate()
         {
-            if (followPlayer && _playerTransform == null)
+            if (followPlayer && _playerTransform == null && Time.time >= _nextPlayerLookupTime)
             {
+                _nextPlayerLookupTime = Time.time + 1f;
                 // Auto-detect local player if not set
                 var players = Object.FindObjectsByType<RaceProgress>(FindObjectsSortMode.None);
                 foreach (var p in players)

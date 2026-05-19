@@ -12,6 +12,7 @@ namespace MienTayDaiChien.UI
         
         private BoatController _player;
         private float _fps;
+        private float _nextLookupTime;
 
         private void Start()
         {
@@ -25,8 +26,9 @@ namespace MienTayDaiChien.UI
 
             if (!panelRoot.activeInHierarchy) return;
 
-            if (_player == null)
+            if (_player == null && Time.time >= _nextLookupTime)
             {
+                _nextLookupTime = Time.time + 1f;
                 var progress = Object.FindObjectsByType<RaceProgress>(FindObjectsSortMode.None);
                 foreach (var r in progress) if (r.IsLocalPlayer) _player = r.GetComponent<BoatController>();
             }

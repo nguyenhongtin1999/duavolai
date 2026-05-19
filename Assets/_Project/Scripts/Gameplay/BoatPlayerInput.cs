@@ -40,7 +40,6 @@ namespace MienTayDaiChien.Gameplay
             if (_accelAction == null) Debug.LogError("[BoatPlayerInput] Accelerate action not found!");
 
             inputActions.Enable();
-            Debug.Log("[BoatPlayerInput] Input Actions Enabled");
         }
 
         private void Update()
