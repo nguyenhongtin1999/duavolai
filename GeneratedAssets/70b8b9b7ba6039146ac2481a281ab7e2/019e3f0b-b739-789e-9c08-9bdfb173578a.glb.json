@@ -1,0 +1,23 @@
+{
+    "asset": "70b8b9b7ba6039146ac2481a281ab7e2",
+    "fileName": "019e3f0b-b739-789e-9c08-9bdfb173578a.glb",
+    "prompt": "Stylized production-ready checkpoint gate for river racing. Grand wooden structure, large Five-Color Traditional Flags on sides, 20m span. Matching reference style.",
+    "negativePrompt": "",
+    "model": "model3d-tripo-p1",
+    "modelName": "Tripo P1",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "refinementMode": "Generation",
+    "promptImageReferenceGuid": "fa9842e88f01b9c4b9d35e0b9bafcd83",
+    "modelReferenceGuid": "",
+    "multiviewFrontGuid": "",
+    "multiviewBackGuid": "",
+    "multiviewLeftGuid": "",
+    "multiviewRightGuid": "",
+    "multiviewTopGuid": "",
+    "multiviewBottomGuid": "",
+    "multiviewLeftFrontGuid": "",
+    "multiviewRightFrontGuid": "",
+    "faceLimit": -1
+}

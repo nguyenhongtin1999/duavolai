@@ -1,0 +1,23 @@
+{
+    "asset": "12f3bf49d9a84e744ba593221bc8b55f",
+    "fileName": "019e3eed-c01e-75d8-849f-08d7c407deca.glb",
+    "prompt": "Traditional Vietnamese village utility pole, weathered wood, wires attached, stylized. Matching reference style.",
+    "negativePrompt": "",
+    "model": "model3d-tripo-p1",
+    "modelName": "Tripo P1",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "refinementMode": "Generation",
+    "promptImageReferenceGuid": "fa9842e88f01b9c4b9d35e0b9bafcd83",
+    "modelReferenceGuid": "",
+    "multiviewFrontGuid": "",
+    "multiviewBackGuid": "",
+    "multiviewLeftGuid": "",
+    "multiviewRightGuid": "",
+    "multiviewTopGuid": "",
+    "multiviewBottomGuid": "",
+    "multiviewLeftFrontGuid": "",
+    "multiviewRightFrontGuid": "",
+    "faceLimit": -1
+}

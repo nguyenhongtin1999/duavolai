@@ -1,0 +1,23 @@
+{
+    "asset": "8c7cbbcd429aba142acaf5b7df389493",
+    "fileName": "019e3f09-9709-7572-9767-bb266b1bd591.glb",
+    "prompt": "Floating weathered tropical wooden log, mossy details, 5m length, low poly. Suitable for river obstacle. Matching reference style.",
+    "negativePrompt": "",
+    "model": "model3d-tripo-p1",
+    "modelName": "Tripo P1",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "refinementMode": "Generation",
+    "promptImageReferenceGuid": "fa9842e88f01b9c4b9d35e0b9bafcd83",
+    "modelReferenceGuid": "",
+    "multiviewFrontGuid": "",
+    "multiviewBackGuid": "",
+    "multiviewLeftGuid": "",
+    "multiviewRightGuid": "",
+    "multiviewTopGuid": "",
+    "multiviewBottomGuid": "",
+    "multiviewLeftFrontGuid": "",
+    "multiviewRightFrontGuid": "",
+    "faceLimit": -1
+}

@@ -1,0 +1,23 @@
+{
+    "asset": "7b1adec7c2690d9459b250642fdebff5",
+    "fileName": "019e3f0b-6f5a-74e6-b401-c623a16de09f.glb",
+    "prompt": "Directional race sign. Large wooden arrow on a pole, brightly painted yellow and red, stylized. Matching reference style.",
+    "negativePrompt": "",
+    "model": "model3d-tripo-p1",
+    "modelName": "Tripo P1",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "refinementMode": "Generation",
+    "promptImageReferenceGuid": "fa9842e88f01b9c4b9d35e0b9bafcd83",
+    "modelReferenceGuid": "",
+    "multiviewFrontGuid": "",
+    "multiviewBackGuid": "",
+    "multiviewLeftGuid": "",
+    "multiviewRightGuid": "",
+    "multiviewTopGuid": "",
+    "multiviewBottomGuid": "",
+    "multiviewLeftFrontGuid": "",
+    "multiviewRightFrontGuid": "",
+    "faceLimit": -1
+}

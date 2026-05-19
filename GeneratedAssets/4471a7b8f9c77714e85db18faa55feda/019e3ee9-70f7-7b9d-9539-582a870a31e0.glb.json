@@ -1,0 +1,23 @@
+{
+    "asset": "4471a7b8f9c77714e85db18faa55feda",
+    "fileName": "019e3ee9-70f7-7b9d-9539-582a870a31e0.glb",
+    "prompt": "Tropical coconut palm tree, stylized, leaning trunk, vibrant green fronds, low poly for mobile. Matching the style of the provided reference.",
+    "negativePrompt": "",
+    "model": "model3d-tripo-p1",
+    "modelName": "Tripo P1",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "refinementMode": "Generation",
+    "promptImageReferenceGuid": "fa9842e88f01b9c4b9d35e0b9bafcd83",
+    "modelReferenceGuid": "",
+    "multiviewFrontGuid": "",
+    "multiviewBackGuid": "",
+    "multiviewLeftGuid": "",
+    "multiviewRightGuid": "",
+    "multiviewTopGuid": "",
+    "multiviewBottomGuid": "",
+    "multiviewLeftFrontGuid": "",
+    "multiviewRightFrontGuid": "",
+    "faceLimit": -1
+}

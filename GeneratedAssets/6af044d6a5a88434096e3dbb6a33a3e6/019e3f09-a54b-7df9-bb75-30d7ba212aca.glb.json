@@ -1,0 +1,23 @@
+{
+    "asset": "6af044d6a5a88434096e3dbb6a33a3e6",
+    "fileName": "019e3f09-a54b-7df9-bb75-30d7ba212aca.glb",
+    "prompt": "Stylized arcade boost pad for river racing. Wooden frame, glowing cyan neon Vietnamese geometric patterns on top, low poly, 4x4m square. Matching reference style.",
+    "negativePrompt": "",
+    "model": "model3d-tripo-p1",
+    "modelName": "Tripo P1",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "refinementMode": "Generation",
+    "promptImageReferenceGuid": "fa9842e88f01b9c4b9d35e0b9bafcd83",
+    "modelReferenceGuid": "",
+    "multiviewFrontGuid": "",
+    "multiviewBackGuid": "",
+    "multiviewLeftGuid": "",
+    "multiviewRightGuid": "",
+    "multiviewTopGuid": "",
+    "multiviewBottomGuid": "",
+    "multiviewLeftFrontGuid": "",
+    "multiviewRightFrontGuid": "",
+    "faceLimit": -1
+}

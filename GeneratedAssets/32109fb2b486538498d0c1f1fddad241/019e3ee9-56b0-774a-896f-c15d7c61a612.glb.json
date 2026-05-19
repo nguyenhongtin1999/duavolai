@@ -1,0 +1,23 @@
+{
+    "asset": "32109fb2b486538498d0c1f1fddad241",
+    "fileName": "019e3ee9-56b0-774a-896f-c15d7c61a612.glb",
+    "prompt": "Stylized Vietnamese stilt house, low poly, mobile optimized. Wooden structure, thatched roof, open porch. 5x5m footprint. Matching the style of the provided reference.",
+    "negativePrompt": "",
+    "model": "model3d-tripo-p1",
+    "modelName": "Tripo P1",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "refinementMode": "Generation",
+    "promptImageReferenceGuid": "fa9842e88f01b9c4b9d35e0b9bafcd83",
+    "modelReferenceGuid": "",
+    "multiviewFrontGuid": "",
+    "multiviewBackGuid": "",
+    "multiviewLeftGuid": "",
+    "multiviewRightGuid": "",
+    "multiviewTopGuid": "",
+    "multiviewBottomGuid": "",
+    "multiviewLeftFrontGuid": "",
+    "multiviewRightFrontGuid": "",
+    "faceLimit": -1
+}

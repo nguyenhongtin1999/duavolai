@@ -1,0 +1,23 @@
+{
+    "asset": "c3644efea942d374db36d244836fc881",
+    "fileName": "019e3f0b-b59c-7ac8-90df-56a8818dcb22.glb",
+    "prompt": "Grand finish line arch for Mekong Delta racing. Ornate wooden architecture, 'FINISH' vibe, many flags and lanterns, 30m span. Matching reference style.",
+    "negativePrompt": "",
+    "model": "model3d-tripo-p1",
+    "modelName": "Tripo P1",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "refinementMode": "Generation",
+    "promptImageReferenceGuid": "fa9842e88f01b9c4b9d35e0b9bafcd83",
+    "modelReferenceGuid": "",
+    "multiviewFrontGuid": "",
+    "multiviewBackGuid": "",
+    "multiviewLeftGuid": "",
+    "multiviewRightGuid": "",
+    "multiviewTopGuid": "",
+    "multiviewBottomGuid": "",
+    "multiviewLeftFrontGuid": "",
+    "multiviewRightFrontGuid": "",
+    "faceLimit": -1
+}

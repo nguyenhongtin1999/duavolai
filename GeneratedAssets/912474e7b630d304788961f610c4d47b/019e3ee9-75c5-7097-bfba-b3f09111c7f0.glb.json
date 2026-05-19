@@ -1,0 +1,23 @@
+{
+    "asset": "912474e7b630d304788961f610c4d47b",
+    "fileName": "019e3ee9-75c5-7097-bfba-b3f09111c7f0.glb",
+    "prompt": "Stylized Vietnamese floating market boat (Ghe), wooden textures, colorful bow eyes, 6m length, low poly. Matching the style of the provided reference.",
+    "negativePrompt": "",
+    "model": "model3d-tripo-p1",
+    "modelName": "Tripo P1",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "refinementMode": "Generation",
+    "promptImageReferenceGuid": "fa9842e88f01b9c4b9d35e0b9bafcd83",
+    "modelReferenceGuid": "",
+    "multiviewFrontGuid": "",
+    "multiviewBackGuid": "",
+    "multiviewLeftGuid": "",
+    "multiviewRightGuid": "",
+    "multiviewTopGuid": "",
+    "multiviewBottomGuid": "",
+    "multiviewLeftFrontGuid": "",
+    "multiviewRightFrontGuid": "",
+    "faceLimit": -1
+}

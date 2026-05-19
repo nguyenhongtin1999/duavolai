@@ -1,0 +1,23 @@
+{
+    "asset": "2b3c3e1b108bfda489df288ebe1286ce",
+    "fileName": "019e3ee9-c786-7ed3-96a1-bd1673479492.glb",
+    "prompt": "Modular wooden dock section, weathered wood planks, supporting poles, 4x2m, tileable end-to-end. Matching the style of the provided reference.",
+    "negativePrompt": "",
+    "model": "model3d-tripo-p1",
+    "modelName": "Tripo P1",
+    "customSeed": -1,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "refinementMode": "Generation",
+    "promptImageReferenceGuid": "fa9842e88f01b9c4b9d35e0b9bafcd83",
+    "modelReferenceGuid": "",
+    "multiviewFrontGuid": "",
+    "multiviewBackGuid": "",
+    "multiviewLeftGuid": "",
+    "multiviewRightGuid": "",
+    "multiviewTopGuid": "",
+    "multiviewBottomGuid": "",
+    "multiviewLeftFrontGuid": "",
+    "multiviewRightFrontGuid": "",
+    "faceLimit": -1
+}
