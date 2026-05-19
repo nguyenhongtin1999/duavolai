@@ -14,6 +14,7 @@ namespace MienTayDaiChien.Gameplay
         public static RaceManager Instance { get; private set; }
 
         [Header("Race Config")]
+        public RaceRulesConfig raceRulesConfig;
         public int totalLaps = 3;
         public float countdownDuration = 3f;
         public RiverSpline riverSpline;
@@ -34,6 +35,11 @@ namespace MienTayDaiChien.Gameplay
         private void Awake()
         {
             Instance = this;
+            if (raceRulesConfig != null)
+            {
+                totalLaps = raceRulesConfig.totalLaps;
+                countdownDuration = raceRulesConfig.countdownDuration;
+            }
         }
 
         public override void OnNetworkSpawn()
@@ -99,7 +105,8 @@ namespace MienTayDaiChien.Gameplay
             if (riverSpline == null) return false;
             Vector3 forward = racerTransform.forward;
             Vector3 tangent = riverSpline.Container.EvaluateTangent(t);
-            return Vector3.Dot(forward, tangent) < -0.5f; 
+            float threshold = raceRulesConfig != null ? raceRulesConfig.wrongWayDotThreshold : -0.5f;
+            return Vector3.Dot(forward, tangent) < threshold; 
         }
     }
 }

@@ -27,7 +27,7 @@ namespace MienTayDaiChien.Gameplay
         public float driftHapticIntensity = 0.1f;
         public float boostHapticIntensity = 0.5f;
 
-        private BoatCamera _mainCam;
+        private BoatCameraRig _mainCam;
 
         private void Awake()
         {
@@ -39,7 +39,7 @@ namespace MienTayDaiChien.Gameplay
                 if (_boatMat.HasProperty("_EmissionColor"))
                     _baseGlowColor = _boatMat.GetColor("_EmissionColor");
             }
-            _mainCam = Camera.main?.GetComponent<BoatCamera>();
+            _mainCam = Camera.main?.GetComponent<BoatCameraRig>();
             
             if (speedLinesUI == null)
             {
