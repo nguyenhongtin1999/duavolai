@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace MienTayDaiChien.Gameplay
 {
@@ -7,6 +6,9 @@ namespace MienTayDaiChien.Gameplay
     public class BoatController : MonoBehaviour
     {
         [Header("Movement Settings")]
+        public BoatGameplayConfig gameplayConfig;
+        public BoatPhysicsModel feelModel = new BoatPhysicsModel();
+
         public float acceleration = 2500f;
         public float maxSpeed = 30f;
         public float reverseSpeed = 10f;
@@ -33,7 +35,7 @@ namespace MienTayDaiChien.Gameplay
         private int _driftDirection; // -1 for Left, 1 for Right, 0 for none
 
         [Header("Boost System")]
-public float boostMultiplier = 2f;
+        public float boostMultiplier = 2f;
         public float boostDuration = 3f;
         public float boostCooldown = 5f;
         public float boostCapacity = 1.0f;
@@ -65,6 +67,7 @@ public float boostMultiplier = 2f;
 
         private void Awake()
         {
+            ApplyConfig();
             _rb = GetComponent<Rigidbody>();
             _rb.useGravity = true;
             _rb.linearDamping = waterDrag;
@@ -104,7 +107,6 @@ public float boostMultiplier = 2f;
             // Arcade "Hop" on entry
             _rb.AddForce(Vector3.up * 5f, ForceMode.VelocityChange);
             
-            Debug.Log($"[Drift] Started drifting to the {(_driftDirection > 0 ? "Right" : "Left")}");
         }
 
         private void EndDrift()
@@ -118,19 +120,15 @@ public float boostMultiplier = 2f;
             _driftDirection = 0;
             _currentDriftCharge = 0f;
             _driftLevel = 0;
-            Debug.Log("[Drift] Ended drift");
         }
 
         private void TriggerDriftBoost()
         {
             float duration = driftBoostDurationBase * _driftLevel;
-            float multiplier = 1f + (driftBoostMultiplier - 1f) * (_driftLevel / 3f);
-            
             // Temporary boost override or just use the existing boost logic
             // For now, let's inject it into the boost system but with a shorter duration
             _isBoosting = true;
             _currentBoostTime = duration;
-            Debug.Log($"[Drift] Boost Level {_driftLevel} Activated! Duration: {duration}s");
         }
 
         public void TryBoost()
@@ -139,7 +137,6 @@ public float boostMultiplier = 2f;
             {
                 _isBoosting = true;
                 _currentBoostTime = boostDuration;
-                Debug.Log("[BoatController] Boost Activated");
             }
         }
 
@@ -156,6 +153,36 @@ public float boostMultiplier = 2f;
             transform.rotation = rot;
         }
 
+
+        private void ApplyConfig()
+        {
+            if (gameplayConfig == null) return;
+
+            acceleration = gameplayConfig.acceleration;
+            maxSpeed = gameplayConfig.maxSpeed;
+            reverseSpeed = gameplayConfig.reverseSpeed;
+            steeringTorque = gameplayConfig.steeringTorque;
+            waterDrag = gameplayConfig.waterDrag;
+            angularDrag = gameplayConfig.angularDrag;
+            speedMultiplier = gameplayConfig.speedMultiplier;
+            lateralDrag = gameplayConfig.lateralDrag;
+            driftLateralDrag = gameplayConfig.driftLateralDrag;
+            driftChargeRate = gameplayConfig.driftChargeRate;
+            driftBoostLevel1 = gameplayConfig.driftBoostLevel1;
+            driftBoostLevel2 = gameplayConfig.driftBoostLevel2;
+            driftBoostLevel3 = gameplayConfig.driftBoostLevel3;
+            driftBoostMultiplier = gameplayConfig.driftBoostMultiplier;
+            driftBoostDurationBase = gameplayConfig.driftBoostDurationBase;
+            boostMultiplier = gameplayConfig.boostMultiplier;
+            boostDuration = gameplayConfig.boostDuration;
+            boostCooldown = gameplayConfig.boostCooldown;
+            boostCapacity = gameplayConfig.boostCapacity;
+            boostRefillRate = gameplayConfig.boostRefillRate;
+            floatStrength = gameplayConfig.floatStrength;
+            waterHeight = gameplayConfig.waterHeight;
+            targetSpeedStabilization = gameplayConfig.targetSpeedStabilization;
+        }
+
         private void FixedUpdate()
         {
             if (_rb == null) return;
@@ -166,10 +193,6 @@ public float boostMultiplier = 2f;
             ApplyLateralDrag();
             HandleBoost();
 
-            if (_rb.linearVelocity.magnitude > 0.1f)
-            {
-                Debug.Log($"[BoatController] Velocity: {_rb.linearVelocity}, Speed: {_rb.linearVelocity.magnitude}");
-            }
         }
 
         private void ApplyBuoyancy()
@@ -186,8 +209,9 @@ public float boostMultiplier = 2f;
         private void HandleMovement()
         {
             float combinedInput = _accelInput - _brakeInput;
-            float targetAccel = combinedInput > 0 ? acceleration : reverseSpeed;
-            targetAccel *= speedMultiplier;
+            float speed01 = maxSpeed > 0.01f ? _rb.linearVelocity.magnitude / maxSpeed : 0f;
+            float accelFeel = feelModel != null ? feelModel.EvaluateAccelMultiplier(speed01) : 1f;
+            float targetAccel = (combinedInput > 0 ? acceleration : reverseSpeed) * speedMultiplier * accelFeel;
             if (_isBoosting) targetAccel *= boostMultiplier;
 
             if (Mathf.Abs(combinedInput) > 0.05f)
@@ -199,12 +223,14 @@ public float boostMultiplier = 2f;
             float currentMax = _isBoosting ? maxSpeed * boostMultiplier : maxSpeed;
             if (_rb.linearVelocity.magnitude > currentMax)
             {
-                _rb.linearVelocity = _rb.linearVelocity.normalized * currentMax;
+                float weightResponse = feelModel != null ? feelModel.weightResponse : 0.15f;
+                _rb.linearVelocity = Vector3.Lerp(_rb.linearVelocity, _rb.linearVelocity.normalized * currentMax, weightResponse);
             }
             
             if (Mathf.Abs(combinedInput) < 0.05f)
             {
-                _rb.linearVelocity = Vector3.Lerp(_rb.linearVelocity, Vector3.zero, targetSpeedStabilization * Time.fixedDeltaTime);
+                float resistance = feelModel != null ? feelModel.waterResistance : 0.08f;
+                _rb.linearVelocity = Vector3.Lerp(_rb.linearVelocity, Vector3.zero, (targetSpeedStabilization + resistance) * Time.fixedDeltaTime);
             }
         }
 
@@ -236,7 +262,8 @@ public float boostMultiplier = 2f;
             {
                 // Normal Speed-sensitive Steering
                 float speedFactor = Mathf.Clamp01(_rb.linearVelocity.magnitude / maxSpeed);
-                float steeringPower = Mathf.Max(0.5f, speedFactor); 
+                float steeringFeel = feelModel != null ? feelModel.EvaluateSteeringMultiplier(speedFactor) : 1f;
+                float steeringPower = Mathf.Max(0.5f, speedFactor) * steeringFeel; 
                 float torque = steerVal * steeringTorque * steeringPower;
                 _rb.AddTorque(transform.up * torque, ForceMode.Force);
                 
@@ -293,5 +320,5 @@ public float boostMultiplier = 2f;
                 }
             }
         }
-}
+    }
 }

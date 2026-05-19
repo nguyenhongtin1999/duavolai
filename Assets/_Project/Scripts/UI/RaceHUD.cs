@@ -20,6 +20,7 @@ namespace MienTayDaiChien.UI
         public GameObject finishPanel;
 
         private RaceProgress _localPlayer;
+        private float _nextLookupTime;
 
         private void Start()
         {
@@ -31,8 +32,9 @@ namespace MienTayDaiChien.UI
             if (RaceManager.Instance == null) return;
 
             // Find local player if not set
-            if (_localPlayer == null)
+            if (_localPlayer == null && Time.time >= _nextLookupTime)
             {
+                _nextLookupTime = Time.time + 1f;
                 var racers = Object.FindObjectsByType<RaceProgress>(FindObjectsSortMode.None);
                 foreach (var r in racers)
                 {
