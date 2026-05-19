@@ -22,6 +22,7 @@ namespace MienTayDaiChien.UI
         public MinimapManager minimap;
 
         private float _raceStartTime;
+        private float _nextLookupTime;
 
         private void Start()
         {
@@ -30,8 +31,9 @@ namespace MienTayDaiChien.UI
 
         private void Update()
         {
-            if (playerBoat == null)
+            if (playerBoat == null && Time.time >= _nextLookupTime)
             {
+                _nextLookupTime = Time.time + 1f;
                 // Try to find the local player boat if not assigned
                 var racers = Object.FindObjectsByType<RaceProgress>(FindObjectsSortMode.None);
                 foreach (var r in racers)

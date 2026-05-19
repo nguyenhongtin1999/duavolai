@@ -8,6 +8,7 @@ namespace MienTayDaiChien.Gameplay
         public AudioSource engineSource;
         public AudioSource boostSource;
         public AudioSource collisionSource;
+        public AudioSource riverAmbienceSource;
 
         [Header("Engine Pitching")]
         public float minPitch = 0.5f;
@@ -21,6 +22,7 @@ namespace MienTayDaiChien.Gameplay
         private BoatController _boat;
         private Rigidbody _rb;
         private bool _wasBoosting;
+        private float _nextAudioTick;
 
         private void Awake()
         {
@@ -30,8 +32,12 @@ namespace MienTayDaiChien.Gameplay
 
         private void Update()
         {
+            if (Time.time < _nextAudioTick) return;
+            _nextAudioTick = Time.time + 0.033f;
+
             HandleEngineAudio();
             HandleBoostAudio();
+            HandleAmbienceAudio();
         }
 
         private void HandleEngineAudio()
@@ -44,6 +50,14 @@ namespace MienTayDaiChien.Gameplay
             
             // Adjust volume slightly with speed
             engineSource.volume = Mathf.Lerp(0.3f, 0.8f, pitchFactor);
+        }
+
+        private void HandleAmbienceAudio()
+        {
+            if (riverAmbienceSource == null || _boat == null) return;
+            float speed01 = Mathf.Clamp01(_boat.CurrentSpeed / maxSpeedForPitch);
+            riverAmbienceSource.volume = Mathf.Lerp(0.25f, 0.55f, speed01);
+            riverAmbienceSource.pitch = Mathf.Lerp(0.95f, 1.1f, speed01);
         }
 
         private void HandleBoostAudio()
