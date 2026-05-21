@@ -128,8 +128,30 @@
                 },
                 {
                     "name": "",
+                    "id": "a2b3c4d5-6789-4a0b-8c1d-23d84a0b975a",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Accelerate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "b2c3d4e5-6789-4a0b-8c1d-23d84a0b9759",
                     "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Brake",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b2c3d4e5-6789-4a0b-8c1d-23d84a0b975a",
+                    "path": "<Gamepad>/leftTrigger",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -171,6 +193,17 @@
                     "isPartOfComposite": false
                 },
                 {
+                    "name": "",
+                    "id": "c2d3e4f5-6789-4a0b-8c1d-23d84a0b975b",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Drift",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+{
                     "name": "",
                     "id": "d2e3f4a5-6789-4a0b-8c1d-23d84a0b9759",
                     "path": "<Keyboard>/h",

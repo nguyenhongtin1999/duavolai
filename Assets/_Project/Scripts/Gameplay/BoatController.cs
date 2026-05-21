@@ -7,14 +7,14 @@ namespace MienTayDaiChien.Gameplay
     public class BoatController : MonoBehaviour
     {
         [Header("Movement Settings")]
-        public float acceleration = 2500f;
-        public float maxSpeed = 30f;
-        public float reverseSpeed = 10f;
-        public float steeringTorque = 1500f;
-        public float waterDrag = 1f;
-        public float angularDrag = 3f;
+        public float acceleration = 15000f; // Snappier for 1000kg
+        public float maxSpeed = 45f; // ~162 km/h
+        public float reverseSpeed = 20f;
+        public float steeringTorque = 4000f; // Faster rotation
+        public float waterDrag = 0.5f; // Lower drag for higher speed
+        public float angularDrag = 4f;
         public float speedMultiplier = 1.0f;
-        
+
         [Header("Drift & Slippery Feel")]
         [Range(0, 1)] public float lateralDrag = 0.95f; 
         public float driftLateralDrag = 0.6f;

@@ -18,14 +18,19 @@ namespace MienTayDaiChien.Gameplay
         
         [Header("Settings")]
         public float splashMinSpeed = 5f;
-        public float splashMaxEmission = 50f;
+        public float splashMaxEmission = 80f;
         public Color boostGlowColor = new Color(0, 1, 1, 1);
         private Color _baseGlowColor;
         private Material _boatMat;
 
+        [Header("Post-Processing Juice")]
+        private Volume _globalVolume;
+        private ChromaticAberration _ca;
+        private LensDistortion _lens;
+
         [Header("Haptics")]
-        public float driftHapticIntensity = 0.1f;
-        public float boostHapticIntensity = 0.5f;
+        public float driftHapticIntensity = 0.15f;
+        public float boostHapticIntensity = 0.6f;
 
         private BoatCamera _mainCam;
 
@@ -42,8 +47,14 @@ namespace MienTayDaiChien.Gameplay
             _mainCam = Camera.main?.GetComponent<BoatCamera>();
             
             if (speedLinesUI == null)
-            {
                 speedLinesUI = GameObject.Find("SpeedLines_VFX");
+
+            // Setup PP hooks
+            _globalVolume = Object.FindAnyObjectByType<Volume>();
+            if (_globalVolume != null && _globalVolume.sharedProfile != null)
+            {
+                _globalVolume.sharedProfile.TryGet(out _ca);
+                _globalVolume.sharedProfile.TryGet(out _lens);
             }
         }
 
@@ -53,6 +64,7 @@ namespace MienTayDaiChien.Gameplay
             HandleBoostEffects();
             HandleDriftFeedback();
             HandleSpeedLines();
+            HandlePostProcessingJuice();
         }
 
         private void HandleWaterSplashes()
@@ -60,8 +72,7 @@ namespace MienTayDaiChien.Gameplay
             float speed = _boat.CurrentSpeed;
             float emissionScale = Mathf.InverseLerp(splashMinSpeed, _boat.maxSpeed, speed);
             
-            // Boost amplification
-            if (_boat.IsBoosting) emissionScale *= 1.5f;
+            if (_boat.IsBoosting) emissionScale *= 1.8f;
 
             var emissionL = waterSplashL.emission;
             var emissionR = waterSplashR.emission;
@@ -76,12 +87,11 @@ namespace MienTayDaiChien.Gameplay
                 emissionL.rateOverTime = rate;
                 emissionR.rateOverTime = rate;
                 
-                // Scale particle size with speed/boost
                 var mainL = waterSplashL.main;
                 var mainR = waterSplashR.main;
-                float baseSize = 1.5f;
-                mainL.startSize = baseSize * (1f + emissionScale * 0.5f);
-                mainR.startSize = baseSize * (1f + emissionScale * 0.5f);
+                float baseSize = 1.2f;
+                mainL.startSize = baseSize * (1f + emissionScale * 0.4f);
+                mainR.startSize = baseSize * (1f + emissionScale * 0.4f);
             }
         }
 
@@ -93,12 +103,12 @@ namespace MienTayDaiChien.Gameplay
             {
                 if (_boatMat != null && _boatMat.HasProperty("_EmissionColor"))
                 {
-                    _boatMat.SetColor("_EmissionColor", boostGlowColor * 2f);
+                    _boatMat.SetColor("_EmissionColor", boostGlowColor * 3f);
                 }
                 
                 if (_mainCam != null)
                 {
-                    _mainCam.TriggerShake(1.5f, 0.1f);
+                    _mainCam.TriggerShake(1.2f, 0.1f);
                 }
                 
                 TriggerHaptics(boostHapticIntensity, boostHapticIntensity);
@@ -107,9 +117,21 @@ namespace MienTayDaiChien.Gameplay
             {
                 if (_boatMat != null && _boatMat.HasProperty("_EmissionColor"))
                 {
-                    _boatMat.SetColor("_EmissionColor", _baseGlowColor);
+                    _boatMat.SetColor("_EmissionColor", Color.Lerp(_boatMat.GetColor("_EmissionColor"), _baseGlowColor, Time.deltaTime * 5f));
                 }
             }
+        }
+
+        private void HandlePostProcessingJuice()
+        {
+            if (_ca == null || _lens == null) return;
+
+            float boostFactor = _boat.IsBoosting ? 1f : 0f;
+            float speedFactor = Mathf.Clamp01(_boat.CurrentSpeed / 40f);
+
+            // Pulse CA and Lens during boost
+            _ca.intensity.Override(Mathf.Lerp(_ca.intensity.value, 0.1f + (boostFactor * 0.4f), Time.deltaTime * 5f));
+            _lens.intensity.Override(Mathf.Lerp(_lens.intensity.value, -0.1f * boostFactor, Time.deltaTime * 5f));
         }
 
         private void HandleDriftFeedback()
@@ -121,17 +143,16 @@ namespace MienTayDaiChien.Gameplay
             {
                 if (!driftSparks.isPlaying) driftSparks.Play();
                 
-                // Color sparks based on level
                 var main = driftSparks.main;
                 if (driftLevel == 1) main.startColor = Color.blue;
-                else if (driftLevel == 2) main.startColor = new Color(1, 0.5f, 0); // Orange
-                else if (driftLevel == 3) main.startColor = new Color(0.6f, 0, 1); // Purple
+                else if (driftLevel == 2) main.startColor = new Color(1, 0.5f, 0);
+                else if (driftLevel == 3) main.startColor = new Color(0.6f, 0, 1);
                 else main.startColor = Color.white;
 
-                TriggerHaptics(driftHapticIntensity * (1 + driftLevel * 0.2f), 0);
+                TriggerHaptics(driftHapticIntensity * (1 + driftLevel * 0.3f), 0);
                 
                 if (_mainCam != null)
-                    _mainCam.TriggerShake(0.5f + driftLevel * 0.1f, 0.05f);
+                    _mainCam.TriggerShake(0.4f + driftLevel * 0.15f, 0.05f);
             }
             else
             {
@@ -144,10 +165,17 @@ namespace MienTayDaiChien.Gameplay
             if (speedLinesUI == null) return;
             
             float speedFactor = _boat.CurrentSpeed / _boat.maxSpeed;
-            bool showLines = speedFactor > 0.8f || _boat.IsBoosting;
+            bool showLines = speedFactor > 0.75f || _boat.IsBoosting;
             
             if (speedLinesUI.activeSelf != showLines)
                 speedLinesUI.SetActive(showLines);
+
+            if (showLines)
+            {
+                // Pulsate speed lines UI slightly
+                float scale = 1f + Mathf.PingPong(Time.time * 10f, 0.05f);
+                speedLinesUI.transform.localScale = new Vector3(scale, scale, 1f);
+            }
         }
 
         private void TriggerHaptics(float left, float right)
@@ -165,11 +193,10 @@ namespace MienTayDaiChien.Gameplay
         
         private void OnCollisionEnter(Collision collision)
         {
-            if (collision.relativeVelocity.magnitude > 8f)
+            if (collision.relativeVelocity.magnitude > 6f)
             {
-                if (_mainCam != null) _mainCam.TriggerShake(2.0f, 0.2f);
-                TriggerHaptics(0.8f, 0.8f);
-                // Hook for sound: PlayCollisionSFX()
+                if (_mainCam != null) _mainCam.TriggerShake(1.5f, 0.25f);
+                TriggerHaptics(0.9f, 0.9f);
             }
         }
     }

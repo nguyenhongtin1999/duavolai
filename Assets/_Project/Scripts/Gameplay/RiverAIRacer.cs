@@ -75,34 +75,63 @@ namespace MienTayDaiChien.Gameplay
             }
         }
 
+        private float _laneChangeTimer;
+        private float _nextLaneChangeTime;
+
         private void Update()
         {
             if (!IsServer || _river == null) return;
 
+            HandleLaneLogic();
             HandlePathFollowing();
             HandleObstacleAvoidance();
             HandleRubberBanding();
             HandleBoostUsage();
         }
 
+        private void HandleLaneLogic()
+        {
+            _laneChangeTimer += Time.deltaTime;
+            if (_laneChangeTimer > _nextLaneChangeTime)
+            {
+                // Randomly pick a lane (Offset from center)
+                _targetLaneOffset = UnityEngine.Random.Range(-5f, 5f);
+                _nextLaneChangeTime = UnityEngine.Random.Range(2f, 8f);
+                _laneChangeTimer = 0f;
+            }
+        }
+
         private void HandlePathFollowing()
         {
             _currentSplinePos = _progress.distanceOnSpline.Value;
 
-            float lookAhead = 0.05f;
+            // Look ahead further at high speed
+            float lookAhead = 0.05f + (_boat.CurrentSpeed * 0.001f);
             float targetT = (_currentSplinePos + lookAhead) % 1.0f;
 
             float3 worldPos, tangent, up;
             _river.Container.Spline.Evaluate(targetT, out worldPos, out tangent, out up);
 
             Vector3 worldRight = Vector3.Cross((Vector3)up, (Vector3)tangent).normalized;
-            Vector3 targetPoint = (Vector3)worldPos + (worldRight * (_targetLaneOffset + _avoidanceOffset));
+            
+            // Smarter lane following with smoothing
+            float currentLane = Mathf.Lerp(_avoidanceOffset, _targetLaneOffset, Time.deltaTime);
+            Vector3 targetPoint = (Vector3)worldPos + (worldRight * currentLane);
 
             Vector3 localTarget = transform.InverseTransformPoint(targetPoint);
-            float steerInput = Mathf.Clamp(localTarget.x * profile.steeringSensitivity, -1f, 1f);
+            
+            // Dynamic steering sensitivity based on turn sharpness
+            float curveSharpness = Vector3.Angle(transform.forward, (Vector3)tangent);
+            float sens = profile.steeringSensitivity * (1f + (curveSharpness * 0.05f));
+            
+            float steerInput = Mathf.Clamp(localTarget.x * sens, -1f, 1f);
 
-            _boat.SetInput(steerInput, 1.0f, 0f, false);
-            }
+            // Ease in acceleration
+            float accelInput = 1.0f;
+            if (curveSharpness > 30f) accelInput = 0.6f; // Brake/Coast for sharp turns
+
+            _boat.SetInput(steerInput, accelInput, 0f, false);
+        }
 
         private void HandleObstacleAvoidance()
         {

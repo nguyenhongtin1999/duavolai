@@ -71,14 +71,29 @@ namespace MienTayDaiChien.UI
             }
         }
 
+        [Header("Juice")]
+        public float pulseScale = 1.2f;
+        public float pulseDuration = 0.5f;
+        private int _lastRank = -1;
+        private int _lastLap = -1;
+
         private void UpdateLeaderboard()
         {
             if (rankingText == null) return;
             var rankings = RaceManager.Instance.Rankings;
+            int myRank = rankings.IndexOf(_localPlayer) + 1;
+
+            if (myRank != _lastRank && myRank > 0)
+            {
+                TriggerPulse(rankingText.transform);
+                _lastRank = myRank;
+            }
+
             string rankStr = "RANKINGS\n";
             for (int i = 0; i < rankings.Count; i++)
             {
-                rankStr += $"{i + 1}. {rankings[i].name}\n";
+                string color = (rankings[i] == _localPlayer) ? "<color=#00FFFF>" : "<color=#FFFFFF>";
+                rankStr += $"{color}{i + 1}. {rankings[i].name}</color>\n";
             }
             rankingText.text = rankStr;
         }
@@ -92,14 +107,42 @@ namespace MienTayDaiChien.UI
 
         private void UpdatePlayerHUD()
         {
+            int currentLapDisplay = Mathf.Min(_localPlayer.Lap + 1, RaceManager.Instance.totalLaps);
             if (lapText != null) 
-                lapText.text = $"LAP {Mathf.Min(_localPlayer.Lap + 1, RaceManager.Instance.totalLaps)} / {RaceManager.Instance.totalLaps}";
+                lapText.text = $"LAP {currentLapDisplay} / {RaceManager.Instance.totalLaps}";
             
+            if (_localPlayer.Lap != _lastLap)
+            {
+                TriggerPulse(lapText.transform);
+                _lastLap = _localPlayer.Lap;
+            }
+
             if (wrongWayIndicator != null) 
                 wrongWayIndicator.gameObject.SetActive(_localPlayer.isWrongWay.Value);
             
             if (finishPanel != null) 
                 finishPanel.SetActive(_localPlayer.isFinished.Value);
+        }
+
+        private void TriggerPulse(Transform target)
+        {
+            if (target == null) return;
+            StartCoroutine(PulseRoutine(target));
+        }
+
+        private System.Collections.IEnumerator PulseRoutine(Transform t)
+        {
+            float elapsed = 0;
+            Vector3 originalScale = Vector3.one;
+            while (elapsed < pulseDuration)
+            {
+                elapsed += Time.deltaTime;
+                float tFactor = elapsed / pulseDuration;
+                float scale = 1f + Mathf.Sin(tFactor * Mathf.PI) * (pulseScale - 1f);
+                if (t != null) t.localScale = originalScale * scale;
+                yield return null;
+            }
+            if (t != null) t.localScale = originalScale;
         }
 
         private void UpdateNavigation()
